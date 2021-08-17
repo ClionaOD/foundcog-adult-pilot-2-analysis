@@ -1,4 +1,5 @@
 .vscode/launch.json
 deriv-2_topup/
-models/
+with-confounds/
 bids/
+glasser_et_al_2016/
