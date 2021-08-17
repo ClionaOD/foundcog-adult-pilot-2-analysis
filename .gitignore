@@ -1,5 +1,12 @@
 .vscode/launch.json
 deriv-2_topup/
+<<<<<<< HEAD
 with-confounds/
 bids/
 glasser_et_al_2016/
+=======
+models/
+bids/
+temp/
+
+>>>>>>> bfb094939cb0118eed82e96f6f83dad7159ccae6
