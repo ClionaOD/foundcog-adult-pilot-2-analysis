@@ -123,10 +123,10 @@ def load_and_estimate(subjind,bidsroot,derivedroot,taskname,numruns,t_r=0.656,sl
 if __name__ == '__main__':
     
     # Set paths for saving
-    modelpth = '/home/CUSACKLAB/clionaodoherty/foundcog-adult-pilot-2-analysis/models'
+    modelpth = '/home/CUSACKLAB/clionaodoherty/foundcog-adult-pilot-2-analysis/with-confounds/models'
 
     # Set arguments for glm fitting
-    subjects = list(range(3,15))
+    subjects = [18]
     subjects = [f'{subjind:02}' for subjind in subjects]
     
     bidsroot = '/home/CUSACKLAB/clionaodoherty/foundcog-adult-pilot-2-analysis/bids'
