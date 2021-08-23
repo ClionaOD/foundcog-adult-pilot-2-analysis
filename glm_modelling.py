@@ -6,9 +6,11 @@ import os
 import pandas as pd
 import pickle
 import numpy as np
+import random
 
 from nilearn import surface
 from nilearn.glm.first_level import make_first_level_design_matrix, FirstLevelModel, run_glm
+from scipy.sparse.construct import rand
 
 def load_and_estimate(subjind,bidsroot,derivedroot,taskname,numruns,t_r=0.656,slice_time_ref=0.5, remap_trial_types=None, elantags=False, conditions=None):
     """
@@ -123,10 +125,11 @@ def load_and_estimate(subjind,bidsroot,derivedroot,taskname,numruns,t_r=0.656,sl
 if __name__ == '__main__':
     
     # Set paths for saving
-    modelpth = '/home/CUSACKLAB/clionaodoherty/foundcog-adult-pilot-2-analysis/with-confounds/models'
+    modelpth = '/home/CUSACKLAB/clionaodoherty/foundcog-adult-pilot-2-analysis/remap/models'
 
     # Set arguments for glm fitting
-    subjects = [18]
+    #subjects = list(range(2,19))
+    subjects=[18]
     subjects = [f'{subjind:02}' for subjind in subjects]
     
     bidsroot = '/home/CUSACKLAB/clionaodoherty/foundcog-adult-pilot-2-analysis/bids'
@@ -135,12 +138,66 @@ if __name__ == '__main__':
     taskname = 'pictures'
     numruns = 3
 
-    for subjind in subjects:
+    tasklist = {
+                'pictures':{
+                        'numruns':3,
+                        'trial_types':[
+                            'seabird', 'crab', 'fish', 'seashell',
+                            'waiter', 'dishware', 'spoon', 'food',
+                            'tree_', 'flower_', 'rock', 'squirrel',
+                            'sink', 'shampoo', 'rubberduck', 'towel',
+                            'shelves', 'shoppingcart', 'soda', 'car',
+                            'dog', 'cat', 'ball', 'fence'],
+                        'n_reps':3
+                        },
+                'video':{
+                        'numruns':2,
+                        'trial_types':[ 'bathsong.mp4', 'dog.mp4', 'new_orleans.mp4', 'minions_supermarket.mp4', 'forest.mp4', 'piper.mp4'],
+                        'n_reps':1
+                        }
+                }
 
+    pic_vid_mapping = { 
+                        'bathsong.mp4':['sink', 'shampoo', 'rubberduck', 'towel'],
+                        'minions_supermarket.mp4':['shelves', 'shoppingcart', 'soda', 'car'], 
+                        'forest.mp4':['tree_', 'flower_', 'rock', 'squirrel'],
+                        'new_orleans.mp4':['waiter', 'dishware', 'spoon', 'food'], 
+                        'dog.mp4':['dog','cat', 'ball', 'fence'], 
+                        'piper.mp4':['seabird','crab', 'fish', 'seashell']}
+    
+    remap_pictures = True
+    remap_shuffle = True
+    # Pictures will just be represented by their corresponding video this after remapping
+    if remap_pictures:
+        tasklist['pictures']['trial_types'] = tasklist['video']['trial_types']
+        remap='_remap'
+        
+        if remap_shuffle:
+            all_imgs = ['seabird', 'crab', 'fish', 'seashell',
+                        'waiter', 'dishware', 'spoon', 'food',
+                        'tree_', 'flower_', 'rock', 'squirrel',
+                        'sink', 'shampoo', 'rubberduck', 'towel',
+                        'shelves', 'shoppingcart', 'soda', 'car',
+                        'dog', 'cat', 'ball', 'fence']
+            new_groups = []
+            for i in range(len(tasklist['video']['trial_types'])):
+                x = random.sample(all_imgs,k=4)
+                [all_imgs.remove(z) for z in x]
+                new_groups.append(x)
+
+            pic_vid_mapping = dict(zip(pic_vid_mapping.keys(),new_groups))
+            remap='_remap-shuffle'
+        
+        remap_pictures_to_video = {z:x for x,y in pic_vid_mapping.items() for z in y}
+
+    for subjind in subjects:
         print(f'working on subject {subjind}')
-        fmri_glm, surf_glm = load_and_estimate(subjind,bidsroot,derivedroot,taskname,numruns)
+        if remap_pictures:
+            fmri_glm, surf_glm = load_and_estimate(subjind,bidsroot,derivedroot,taskname,numruns, remap_trial_types=remap_pictures_to_video)
+        else:
+            fmri_glm, surf_glm = load_and_estimate(subjind,bidsroot,derivedroot,taskname,numruns)
         
         os.makedirs(os.path.join(modelpth,f'sub-{subjind}'), exist_ok=True)
         
-        with open(os.path.join(modelpth,f'sub-{subjind}',f'sub-{subjind}_task-{taskname}_models.pickle'),'wb') as f:
+        with open(os.path.join(modelpth,f'sub-{subjind}',f'sub-{subjind}_task-{taskname}{remap}_models.pickle'),'wb') as f:
                 pickle.dump({'fmri_glm': fmri_glm, 'surf_glm': surf_glm},f)
