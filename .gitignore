@@ -7,6 +7,7 @@ models/
 bids/
 temp/
 remap/
+segmented/
 pilot-2-full-pipeline/
 pilot-2-full-shuffle/
 
