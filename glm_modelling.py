@@ -177,7 +177,7 @@ if __name__ == '__main__':
     modelpth = '/home/CUSACKLAB/clionaodoherty/foundcog-adult-pilot-2-analysis/segmented/models'
 
     # Set arguments for glm fitting
-    subjects = list(range(2,18))
+    subjects = list(range(7,18))
     #subjects=[18]
     subjects = [f'{subjind:02}' for subjind in subjects]
     
@@ -255,5 +255,5 @@ if __name__ == '__main__':
         
         os.makedirs(os.path.join(modelpth,f'sub-{subjind}'), exist_ok=True)
         
-        with open(os.path.join(modelpth,f'sub-{subjind}',f'sub-{subjind}_task-{taskname}{remap}_segment-{segment_into}_models.pickle'),'wb') as f:
-            pickle.dump({'fmri_glm': fmri_glm, 'surf_glm': surf_glm},f)
+        # with open(os.path.join(modelpth,f'sub-{subjind}',f'sub-{subjind}_task-{taskname}{remap}_segment-{segment_into}_models.pickle'),'wb') as f:
+        #     pickle.dump({'fmri_glm': fmri_glm, 'surf_glm': surf_glm},f)
